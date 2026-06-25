@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lone Wish Linden — ONWR Enchantment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            inter: ['Inter', 'ui-sans-serif', 'system-ui'],
+            serif: ['Playfair Display', 'serif'],
+            instrument: ['Instrument Serif', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #000; color: #fff; overflow-x: hidden; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: rgba(52, 211, 153, 0.3); border-radius: 3px; }
+
+    .willow-branch {
+      animation: sway 4s ease-in-out infinite;
+      transform-origin: top center;
+    }
+    .willow-branch:nth-child(2) { animation-delay: -0.5s; animation-duration: 4.5s; }
+    .willow-branch:nth-child(3) { animation-delay: -1s; animation-duration: 3.8s; }
+    .willow-branch:nth-child(4) { animation-delay: -1.5s; animation-duration: 5s; }
+    .willow-branch:nth-child(5) { animation-delay: -2s; animation-duration: 4.2s; }
+    .willow-branch:nth-child(6) { animation-delay: -0.3s; animation-duration: 3.5s; }
+    .willow-branch:nth-child(7) { animation-delay: -2.5s; animation-duration: 4.8s; }
+    .willow-branch:nth-child(8) { animation-delay: -1.8s; animation-duration: 3.9s; }
+
+    @keyframes sway {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(2deg); }
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: rgba(52, 211, 153, 0.6);
+      pointer-events: none;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translateY(0) scale(0); }
+      10% { opacity: 1; transform: scale(1); }
+      90% { opacity: 0.5; }
+      100% { opacity: 0; transform: translateY(-100vh) scale(0.3); }
+    }
+
+    .wish-orb {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 20px #34d399, 0 0 40px rgba(52,211,153,0.4), 0 0 80px rgba(52,211,153,0.2);
+      animation: orbPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes orbPulse {
+      0%, 100% { box-shadow: 0 0 20px #34d399, 0 0 40px rgba(52,211,153,0.4); transform: scale(1); }
+      50% { box-shadow: 0 0 30px #34d399, 0 0 60px rgba(52,211,153,0.5), 0 0 100px rgba(52,211,153,0.3); transform: scale(1.15); }
+    }
+
+    .wish-rising {
+      animation: riseUp 4s ease-out forwards;
+    }
+
+    @keyframes riseUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      30% { opacity: 1; transform: translateY(-80px) scale(1.3); }
+      100% { opacity: 0; transform: translateY(-400px) scale(0.2); }
+    }
+
+    .border-gradient { position: relative; }
+    .border-gradient::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      background: linear-gradient(225deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
+    }
+
+    .glow-text {
+      text-shadow: 0 0 40px rgba(52,211,153,0.3), 0 0 80px rgba(52,211,153,0.15);
+    }
+
+    @keyframes marquee-left {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .marquee-track {
+      animation: marquee-left 40s linear infinite;
+    }
+
+    .appear {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .appear.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .leaf {
+      position: absolute;
+      width: 8px;
+      height: 12px;
+      background: rgba(52, 211, 153, 0.4);
+      border-radius: 0 50% 0 50%;
+      pointer-events: none;
+      animation: leafFall linear infinite;
+    }
+
+    @keyframes leafFall {
+      0% { opacity: 0; transform: translateY(-20px) rotate(0deg) translateX(0); }
+      10% { opacity: 0.7; }
+      100% { opacity: 0; transform: translateY(100vh) rotate(360deg) translateX(80px); }
+    }
+
+    .wish-card {
+      transition: transform 500ms cubic-bezier(0.15,0.83,0.66,1), box-shadow 500ms;
+    }
+    .wish-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 25px 50px -12px rgba(52,211,153,0.15);
+    }
+
+    .toast {
+      animation: toastIn 0.4s ease, toastOut 0.4s ease 3s forwards;
+    }
+    @keyframes toastIn {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; }
+      to { opacity: 0; transform: translateY(-10px); }
+    }
+
+    .timeline-glow {
+      background: linear-gradient(to bottom, #34d399, #2dd4bf, #22d3ee);
+      box-shadow: 0 0 10px rgba(52,211,153,0.4);
+    }
+
+    .shimmer {
+      position: relative;
+      overflow: hidden;
+    }
+    .shimmer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 55%, transparent 60%);
+      animation: shimmerMove 3s ease-in-out infinite;
+    }
+    @keyframes shimmerMove {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .wish-area { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='6' fill='none' stroke='%2334d399' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='12' r='2' fill='%2334d399'/%3E%3C/svg%3E") 12 12, crosshair; }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(52,211,153,0.5);
+      animation: rippleOut 1.5s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes rippleOut {
+      0% { width: 0; height: 0; opacity: 1; }
+      100% { width: 200px; height: 200px; opacity: 0; margin-left: -100px; margin-top: -100px; }
+    }
+
+    .nav-blur {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="font-inter">
+
+  <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
+  <div id="leaves" class="fixed inset-0 pointer-events-none z-0"></div>
+
+  <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none z-0"></div>
+  <div class="fixed bottom-0 right-0 w-[600px] h-[600px] rounded-full bg-teal-500/5 blur-[100px] pointer-events-none z-0"></div>
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-black/60 border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-emerald-400/20 flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2">
+            <path d="M12 2C8 6 4 10 4 14a8 8 0 0016 0c0-4-4-8-8-12z"/>
+          </svg>
+        </div>
+        <span class="text-sm font-semibold tracking-wider uppercase">ONWR</span>
+        <span class="text-xs text-white/40 ml-1">Enchantment</span>
+      </div>
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#story" class="text-sm text-white/60 hover:text-white transition-colors duration-150">Story</a>
+        <a href="#ritual" class="text-sm text-white/60 hover:text-white transition-colors duration-150">Ritual</a>
+        <a href="#wish" class="text-sm text-white/60 hover:text-white transition-colors duration-150">Make a Wish</a>
+        <a href="#collection" class="text-sm text-white/60 hover:text-white transition-colors duration-150">Collection</a>
+      </div>
+      <button id="mobileMenuBtn" class="md:hidden text-white/60 hover:text-white transition">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <a href="#wish" class="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-emerald-400 hover:bg-emerald-300 text-black text-sm font-medium rounded-full transition-colors duration-200">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8 6 4 10 4 14a8 8 0 0016 0c0-4-4-8-8-12z"/></svg>
+        Cast a Wish
+      </a>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden border-t border-white/5 px-6 py-4 space-y-3">
+      <a href="#story" class="block text-sm text-white/60 hover:text-white">Story</a>
+      <a href="#ritual" class="block text-sm text-white/60 hover:text-white">Ritual</a>
+      <a href="#wish" class="block text-sm text-white/60 hover:text-white">Make a Wish</a>
+      <a href="#collection" class="block text-sm text-white/60 hover:text-white">Collection</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative min-h-screen flex items-center justify-center pt-20 pb-10 overflow-hidden">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at top, rgba(52,211,153,0.08), transparent 70%)"></div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-6 lg:px-8 text-center">
+      <div class="appear inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-400/10 border border-emerald-400/20 mb-8">
+        <span class="wish-orb" style="width:6px;height:6px;"></span>
+        <span class="text-xs font-medium text-emerald-400 tracking-wider uppercase">Lone Wish Linden — Limited Edition</span>
+      </div>
+
+      <h1 class="appear font-serif text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tighter leading-[0.9] mb-6">
+        <span class="block" style="background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.6) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Lone Wish</span>
+        <span class="block glow-text text-emerald-400" style="-webkit-text-fill-color: #34d399;">Linden</span>
+      </h1>
+
+      <p class="appear text-base sm:text-lg text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed">
+        Beneath the ancient linden, where moonlight weaves through cascading branches, a single wish awaits its keeper. From the ONWR Enchantment collection — where nature whispers and dreams take root.
+      </p>
+
+      <div class="appear flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <a href="#wish" class="group inline-flex items-center gap-2 px-6 py-3 bg-emerald-400 hover:bg-emerald-300 text-black text-sm font-medium rounded-full transition-all duration-300 shadow-lg shadow-emerald-900/25">
+          Make Your Wish
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="group-hover:translate-x-0.5 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#story" class="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 text-white text-sm font-medium rounded-full border border-white/10 hover:border-white/20 transition-all duration-300">
+          Discover the Legend
+        </a>
+      </div>
+
+      <!-- Tree Illustration -->
+      <div class="appear relative max-w-lg mx-auto">
+        <svg viewBox="0 0 400 350" class="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
+          <path d="M200 340 L200 180 Q200 160 195 145 Q185 120 190 100" stroke="#5a7a64" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <path d="M200 200 Q210 170 205 140" stroke="#5a7a64" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+          <g class="willow-branch">
+            <path d="M195 145 Q160 130 120 160 Q90 180 70 220" stroke="#4a6a54" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M70 220 Q60 250 55 290" stroke="#34d399" stroke-width="1" fill="none" opacity="0.4"/>
+            <path d="M80 210 Q75 240 65 280" stroke="#34d399" stroke-width="1" fill="none" opacity="0.3"/>
+            <path d="M90 200 Q85 230 80 270" stroke="#34d399" stroke-width="1" fill="none" opacity="0.35"/>
+            <circle cx="55" cy="290" r="2" fill="#34d399" opacity="0.6"/>
+            <circle cx="65" cy="280" r="1.5" fill="#34d399" opacity="0.5"/>
+          </g>
+
+          <g class="willow-branch">
+            <path d="M198 140 Q175 115 140 120 Q110 125 85 150" stroke="#4a6a54" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M85 150 Q70 180 60 220" stroke="#34d399" stroke-width="1" fill="none" opacity="0.35"/>
+            <path d="M95 155 Q80 185 75 225" stroke="#34d399" stroke-width="1" fill="none" opacity="0.3"/>
+            <circle cx="60" cy="220" r="2" fill="#34d399" opacity="0.5"/>
+          </g>
+
+          <g class="willow-branch">
+            <path d="M200 130 Q190 100 160 85 Q130 70 100 80" stroke="#4a6a54" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M100 80 Q80 100 70 140" stroke="#34d399" stroke-width="1" fill="none" opacity="0.35"/>
+            <path d="M110 85 Q90 105 85 145" stroke="#34d399" stroke-width="1" fill="none" opacity="0.3"/>
+            <circle cx="70" cy="140" r="2" fill="#34d399" opacity="0.5"/>
+          </g>
+
+          <g class="willow-branch">
+            <path d="M200 125 Q200 90 180 65 Q160 40 130 35" stroke="#4a6a54" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M130 35 Q115 55 105 90" stroke="#34d399" stroke-width="1" fill="none" opacity="0.35"/>
+            <path d="M140 38 Q125 58 120 95" stroke="#34d399" stroke-width="1" fill="none" opacity="0.3"/>
+            <circle cx="105" cy="90" r="2" fill="#34d399" opacity="0.5"/>
+          </g>
+
+          <g class="willow-branch">
+            <path d="M202 120 Q210 80 230 55 Q250 35 280 30" stroke="#4a6a54" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M280 30 Q295 50 305 85" stroke="#34d399" stroke-width="1" fill="none" opacity="0.35"/>
+            <path d="M270 33 Q285 53 295 88" stroke="#34d399" stroke-width="1" fill="none" opacity="0.3"/>
+            <circle cx="305" cy="85" r="2" fill="#34d399" opacity="0.5"/>
+          </g>
+
+          <g class="willow-branch">
+            <path d="M205 135 Q220 105 250 90 Q280 78 310 85" stroke="#4a6a54" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M310 85 Q325 110 335 150" stroke="#34d399" stroke-width="1" fill="none" opacity="0.35"/>
+            <path d="M300 88 Q315 113 325 153" stroke="#34d399" stroke-width="1" fill="none" opacity="0.3"/>
+            <circle cx="335" cy="150" r="2" fill="#34d399" opacity="0.5"/>
+          </g>
+
+          <g class="willow-branch">
+            <path d="M205 145 Q230 125 265 125 Q300 128 325 155" stroke="#4a6a54" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M325 155 Q335 185 340 225" stroke="#34d399" stroke-width="1" fill="none" opacity="0.35"/>
+            <path d="M315 150 Q325 180 330 220" stroke="#34d399" stroke-width="1" fill="none" opacity="0.3"/>
+            <circle cx="340" cy="225" r="2" fill="#34d399" opacity="0.5"/>
+          </g>
+
+          <g class="willow-branch">
+            <path d="M200 150 Q225 140 255 155 Q285 170 310 210" stroke="#4a6a54" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M310 210 Q320 240 325 280" stroke="#34d399" stroke-width="1" fill="none" opacity="0.35"/>
+            <path d="M300 205 Q310 235 315 275" stroke="#34d399" stroke-width="1" fill="none" opacity="0.3"/>
+            <circle cx="325" cy="280" r="2" fill="#34d399" opacity="0.5"/>
+          </g>
+
+          <circle cx="200" cy="120" r="40" fill="url(#willowGlow)" opacity="0.3"/>
+          <circle cx="200" cy="120" r="15" fill="url(#willowGlow2)" opacity="0.5"/>
+
+          <circle cx="120" cy="200" r="2" fill="#34d399" opacity="0.8">
+            <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="280" cy="180" r="1.5" fill="#34d399" opacity="0.6">
+            <animate attributeName="opacity" values="0.6;0.1;0.6" dur="3s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="160" cy="100" r="1.5" fill="#2dd4bf" opacity="0.7">
+            <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="250" cy="110" r="2" fill="#34d399" opacity="0.5">
+            <animate attributeName="opacity" values="0.5;0.1;0.5" dur="3.5s" repeatCount="indefinite"/>
+          </circle>
+
+          <defs>
+            <radialGradient id="willowGlow">
+              <stop offset="0%" stop-color="#34d399" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="willowGlow2">
+              <stop offset="0%" stop-color="#34d399" stop-opacity="0.8"/>
+              <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+        </svg>
+        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 h-8 bg-emerald-400/10 rounded-full blur-xl"></div>
+      </div>
+    </div>
+
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
+      <span class="text-[10px] tracking-widest uppercase">Scroll</span>
+      <div class="w-px h-8 bg-gradient-to-b from-white/40 to-transparent"></div>
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="relative py-6 border-y border-white/5 overflow-hidden">
+    <div class="flex whitespace-nowrap marquee-track">
+      <span class="inline-flex items-center gap-8 text-xs tracking-[0.3em] uppercase text-white/20 px-4">
+        <span>Lone Wish Linden</span><span class="text-emerald-400/40">✦</span>
+        <span>ONWR Enchantment</span><span class="text-emerald-400/40">✦</span>
+        <span>Make a Wish</span><span class="text-emerald-400/40">✦</span>
+        <span>Limited Edition</span><span class="text-emerald-400/40">✦</span>
+        <span>Nature's Whisper</span><span class="text-emerald-400/40">✦</span>
+        <span>Dream Rooted</span><span class="text-emerald-400/40">✦</span>
+        <span>Lone Wish Linden</span><span class="text-emerald-400/40">✦</span>
+        <span>ONWR Enchantment</span><span class="text-emerald-400/40">✦</span>
+        <span>Make a Wish</span><span class="text-emerald-400/40">✦</span>
+        <span>Limited Edition</span><span class="text-emerald-400/40">✦</span>
+        <span>Nature's Whisper</span><span class="text-emerald-400/40">✦</span>
+        <span>Dream Rooted</span><span class="text-emerald-400/40">✦</span>
+      </span>
+      <span class="inline-flex items-center gap-8 text-xs tracking-[0.3em] uppercase text-white/20 px-4">
+        <span>Lone Wish Linden</span><span class="text-emerald-400/40">✦</span>
+        <span>ONWR Enchantment</span><span class="text-emerald-400/40">✦</span>
+        <span>Make a Wish</span><span class="text-emerald-400/40">✦</span>
+        <span>Limited Edition</span><span class="text-emerald-400/40">✦</span>
+        <span>Nature's Whisper</span><span class="text-emerald-400/40">✦</span>
+        <span>Dream Rooted</span><span class="text-emerald-400/40">✦</span>
+        <span>Lone Wish Linden</span><span class="text-emerald-400/40">✦</span>
+        <span>ONWR Enchantment</span><span class="text-emerald-400/40">✦</span>
+        <span>Make a Wish</span><span class="text-emerald-400/40">✦</span>
+        <span>Limited Edition</span><span class="text-emerald-400/40">✦</span>
+        <span>Nature's Whisper</span><span class="text-emerald-400/40">✦</span>
+        <span>Dream Rooted</span><span class="text-emerald-400/40">✦</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Story Section -->
+  <section id="story" class="py-24 sm:py-32">
+    <div class="max-w-6xl mx-auto px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div class="appear relative">
+          <div class="border-gradient rounded-2xl overflow-hidden">
+            <img src="https://picsum.photos/seed/linden-misty-forest/600/700.jpg" alt="Linden in mist" class="w-full h-[500px] object-cover rounded-2xl opacity-80 shimmer"/>
+          </div>
+          <div class="absolute -bottom-4 -right-4 sm:bottom-6 sm:right-6 bg-black/80 backdrop-blur-lg border border-white/10 rounded-xl p-4 border-gradient">
+            <div class="flex items-center gap-3">
+              <div class="wish-orb"></div>
+              <div>
+                <p class="text-xs text-white/40 uppercase tracking-wider">Legend says</p>
+                <p class="text-sm font-medium text-emerald-400">One wish per soul</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="appear">
+          <span class="text-xs font-medium text-emerald-400 tracking-widest uppercase">The Legend</span>
+          <h2 class="font-serif text-4xl sm:text-5xl font-bold tracking-tighter mt-3 mb-6" style="background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Where Dreams<br>Take Root
+          </h2>
+          <p class="text-white/60 leading-relaxed mb-6">
+            In the deepest part of the ancient forest, where moonlight barely touches the ground, stands a linden older than memory itself. Its branches cascade like waterfalls of emerald silk, and those who find it are granted a single, extraordinary gift — one wish, carried by the wind through its whispering leaves.
+          </p>
+          <p class="text-white/60 leading-relaxed mb-8">
+            ONWR Enchantment captured this ethereal moment — the scent of dew-kissed bark, the coolness of shaded moss, the electric anticipation of a wish about to be spoken. Lone Wish Linden is not just a fragrance; it's a doorway to the sacred grove where intentions become reality.
+          </p>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div class="border-gradient rounded-xl bg-white/5 p-4 text-center">
+              <p class="text-2xl font-bold text-emerald-400">1000</p>
+              <p class="text-[11px] text-white/40 mt-1 uppercase tracking-wider">Bottles Only</p>
+            </div>
+            <div class="border-gradient rounded-xl bg-white/5 p-4 text-center">
+              <p class="text-2xl font-bold text-emerald-400">7</p>
+              <p class="text-[11px] text-white/40 mt-1 uppercase tracking-wider">Sacred Notes</p>
+            </div>
+            <div class="border-gradient rounded-xl bg-white/5 p-4 text-center">
+              <p class="text-2xl font-bold text-emerald-400">1</p>
+              <p class="text-[11px] text-white/40 mt-1 uppercase tracking-wider">Wish Granted</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ritual / Timeline Section -->
+  <section id="ritual" class="py-24 sm:py-32 border-t border-white/5">
+    <div class="max-w-4xl mx-auto px-6 lg:px-8">
+      <div class="text-center mb-16 appear">
+        <span class="text-xs font-medium text-emerald-400 tracking-widest uppercase">The Ritual</span>
+        <h2 class="font-serif text-4xl sm:text-5xl font-bold tracking-tighter mt-3" style="background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          How to Cast Your Wish
+        </h2>
+      </div>
+
+      <div class="relative">
+        <div class="absolute left-6 sm:left-8 top-0 bottom-0 w-px timeline-glow opacity-30"></div>
+
+        <div class="space-y-12">
+          <div class="appear relative flex gap-6 sm:gap-8 items-start">
+            <div class="relative z-10 flex-shrink-0 w-12 sm:w-16 h-12 sm:h-16 rounded-full bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center">
+              <span class="text-emerald-400 font-serif text-xl font-bold">1</span>
+            </div>
+            <div class="pt-2">
+              <h3 class="text-lg font-semibold mb-2">Find the Linden</h3>
+              <p class="text-white/50 text-sm leading-relaxed">Close your eyes and breathe in the scent — wet earth, green bark, and the faintest trace of moonlight. When you can feel the linden's presence, you're ready.</p>
+            </div>
+          </div>
+
+          <div class="appear relative flex gap-6 sm:gap-8 items-start">
+            <div class="relative z-10 flex-shrink-0 w-12 sm:w-16 h-12 sm:h-16 rounded-full bg-teal-400/10 border border-teal-400/30 flex items-center justify-center">
+              <span class="text-teal-400 font-serif text-xl font-bold">2</span>
+            </div>
+            <div class="pt-2">
+              <h3 class="text-lg font-semibold mb-2">Speak Your Wish</h3>
+              <p class="text-white/50 text-sm leading-relaxed">Whisper it to the leaves. The linden listens only to truths spoken from the heart — not wants of the mind, but needs of the soul.</p>
+            </div>
+          </div>
+
+          <div class="appear relative flex gap-6 sm:gap-8 items-start">
+            <div class="relative z-10 flex-shrink-0 w-12 sm:w-16 h-12 sm:h-16 rounded-full bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center">
+              <span class="text-cyan-400 font-serif text-xl font-bold">3</span>
+            </div>
+            <div class="pt-2">
+              <h3 class="text-lg font-semibold mb-2">Release It to the Wind</h3>
+              <p class="text-white/50 text-sm leading-relaxed">Let go. The wish is no longer yours — it belongs to the linden now. Watch as it rises through the branches, becoming one with the night sky.</p>
+            </div>
+          </div>
+
+          <div class="appear relative flex gap-6 sm:gap-8 items-start">
+            <div class="relative z-10 flex-shrink-0 w-12 sm:w-16 h-12 sm:h-16 rounded-full bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center">
+              <span class="text-emerald-400 font-serif text-xl font-bold">4</span>
+            </div>
+            <div class="pt-2">
+              <h3 class="text-lg font-semibold mb-2">Live in Expectation</h3>
+              <p class="text-white/50 text-sm leading-relaxed">The linden never forgets. Walk forward with quiet certainty, and one day you'll realize — the world has reshaped itself around your wish.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Wish Section -->
+  <section id="wish" class="py-24 sm:py-32 border-t border-white/5 relative">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgba(52,211,153,0.05), transparent 70%)"></div>
+
+    <div class="relative z-10 max-w-4xl mx-auto px-6 lg:px-8">
+      <div class="text-center mb-12 appear">
+        <span class="text-xs font-medium text-emerald-400 tracking-widest uppercase">Your Turn</span>
+        <h2 class="font-serif text-4xl sm:text-5xl font-bold tracking-tighter mt-3 mb-4" style="background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          Cast Your Wish
+        </h2>
+        <p class="text-white/50 max-w-lg mx-auto">Type your wish below and release it to the linden. Choose wisely — the linden grants but one.</p>
+      </div>
+
+      <div class="appear max-w-xl mx-auto">
+        <div class="border-gradient rounded-2xl bg-white/5 backdrop-blur-sm p-8 wish-area relative overflow-hidden" id="wishContainer">
+          <div class="absolute top-4 right-4 w-2 h-2 rounded-full bg-emerald-400/30 animate-pulse"></div>
+          <div class="absolute bottom-8 left-6 w-1.5 h-1.5 rounded-full bg-teal-400/20 animate-pulse" style="animation-delay: 1s;"></div>
+          <div class="absolute top-12 left-10 w-1 h-1 rounded-full bg-cyan-400/30 animate-pulse" style="animation-delay: 0.5s;"></div>
+
+          <div class="relative z-10">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="wish-orb"></div>
+              <span class="text-xs text-emerald-400/80 tracking-wider uppercase font-medium">The Linden Listens</span>
+            </div>
+
+            <textarea
+              id="wishInput"
+              rows="3"
+              maxlength="200"
+              placeholder="Whisper your wish to the linden..."
+              class="w-full bg-transparent border-none outline-none text-white/90 text-lg placeholder:text-white/20 resize-none leading-relaxed font-light"
+            ></textarea>
+
+            <div class="flex items-center justify-between mt-6">
+              <span id="charCount" class="text-xs text-white/30">0 / 200</span>
+              <button
+                id="castWishBtn"
+                class="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-400 hover:bg-emerald-300 text-black text-sm font-medium rounded-full transition-all duration-300 shadow-lg shadow-emerald-900/25 disabled:opacity-30 disabled:cursor-not-allowed"
+                disabled
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8 6 4 10 4 14a8 8 0 0016 0c0-4-4-8-8-12z"/></svg>
+                Release Wish
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="wishReleased" class="hidden mt-8 text-center">
+          <div id="wishOrbContainer" class="flex justify-center mb-6"></div>
+          <p class="text-emerald-400/80 text-sm font-medium mb-1">Your wish has been released to the linden</p>
+          <p class="text-white/30 text-xs">The linden never forgets. Walk forward with quiet certainty.</p>
+          <button id="newWishBtn" class="mt-6 text-xs text-white/30 hover:text-white/60 transition-colors underline underline-offset-4">Cast another wish</button>
+        </div>
+
+        <div class="mt-8 text-center">
+          <p class="text-xs text-white/20">
+            <span id="wishCount" class="text-emerald-400/60 font-medium">2,847</span> wishes have been released to the linden
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Collection / Notes Section -->
+  <section id="collection" class="py-24 sm:py-32 border-t border-white/5">
+    <div class="max-w-6xl mx-auto px-6 lg:px-8">
+      <div class="text-center mb-16 appear">
+        <span class="text-xs font-medium text-emerald-400 tracking-widest uppercase">The Collection</span>
+        <h2 class="font-serif text-4xl sm:text-5xl font-bold tracking-tighter mt-3" style="background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          Sacred Notes
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="appear wish-card border-gradient rounded-2xl bg-white/5 p-6 text-center">
+          <div class="w-14 h-14 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center mx-auto mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.5"><path d="M12 2C8 6 4 10 4 14a8 8 0 0016 0c0-4-4-8-8-12z"/></svg>
+          </div>
+          <h3 class="font-semibold mb-1">Linden Bark</h3>
+          <p class="text-xs text-white/40">Top Note</p>
+          <p class="text-sm text-white/50 mt-3">Green, aqueous, and slightly metallic — the first breath beneath the canopy.</p>
+        </div>
+
+        <div class="appear wish-card border-gradient rounded-2xl bg-white/5 p-6 text-center" style="transition-delay: 0.1s;">
+          <div class="w-14 h-14 rounded-full bg-teal-400/10 border border-teal-400/20 flex items-center justify-center mx-auto mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <h3 class="font-semibold mb-1">Midnight Moss</h3>
+          <p class="text-xs text-white/40">Heart Note</p>
+          <p class="text-sm text-white/50 mt-3">Deep, damp, and contemplative — the forest floor after rain, alive with patience.</p>
+        </div>
+
+        <div class="appear wish-card border-gradient rounded-2xl bg-white/5 p-6 text-center" style="transition-delay: 0.2s;">
+          <div class="w-14 h-14 rounded-full bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center mx-auto mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.5"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/><circle cx="12" cy="12" r="4"/></svg>
+          </div>
+          <h3 class="font-semibold mb-1">Moonlit Dew</h3>
+          <p class="text-xs text-white/40">Heart Note</p>
+          <p class="text-sm text-white/50 mt-3">Luminous and ethereal — the exact moment dew catches moonlight on a leaf.</p>
+        </div>
+
+        <div class="appear wish-card border-gradient rounded-2xl bg-white/5 p-6 text-center" style="transition-delay: 0.3s;">
+          <div class="w-14 h-14 rounded-full bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center mx-auto mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </div>
+          <h3 class="font-semibold mb-1">Desire Balsam</h3>
+          <p class="text-xs text-white/40">Base Note</p>
+          <p class="text-sm text-white/50 mt-3">Warm, amber, and endless — the lingering warmth of a wish fulfilled.</p>
+        </div>
+      </div>
+
+      <!-- Product Showcase -->
+      <div class="mt-20 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div class="appear relative">
+          <div class="border-gradient rounded-2xl overflow-hidden">
+            <img src="https://picsum.photos/seed/dark-perfume-bottle/600/600.jpg" alt="Lone Wish Linden fragrance" class="w-full aspect-square object-cover rounded-2xl opacity-75 shimmer"/>
+          </div>
+        </div>
+        <div class="appear">
+          <span class="text-xs font-medium text-emerald-400 tracking-widest uppercase">Limited Edition</span>
+          <h3 class="font-serif text-3xl sm:text-4xl font-bold tracking-tighter mt-3 mb-4">Eau de Parfum<br><span class="text-emerald-400">50ml</span></h3>
+          <p class="text-white/50 leading-relaxed mb-6">Hand-poured in small batches. Each bottle is numbered and sealed with a single linden leaf preserved in resin. The outer case unfolds like the linden's branches, revealing the fragrance within.</p>
+
+          <div class="space-y-3 mb-8">
+            <div class="flex items-center gap-4">
+              <span class="text-xs text-white/30 w-16">Top</span>
+              <div class="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-400" style="width:30%"></div>
+              </div>
+              <span class="text-xs text-white/40">Linden Bark, Green Accord</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="text-xs text-white/30 w-16">Heart</span>
+              <div class="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="h-full rounded-full bg-gradient-to-r from-teal-400 to-cyan-400" style="width:55%"></div>
+              </div>
+              <span class="text-xs text-white/40">Midnight Moss, Moonlit Dew</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="text-xs text-white/30 w-16">Base</span>
+              <div class="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" style="width:80%"></div>
+              </div>
+              <span class="text-xs text-white/40">Desire Balsam, Amber, Vetiver</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <span class="text-3xl font-bold">$185</span>
+            <span class="text-xs text-white/30">USD / Free worldwide shipping</span>
+          </div>
+          <button id="addToCartBtn" class="mt-6 inline-flex items-center gap-2 px-8 py-3 bg-emerald-400 hover:bg-emerald-300 text-black text-sm font-medium rounded-full transition-all duration-300 shadow-lg shadow-emerald-900/25">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg>
+            Add to Collection
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="py-24 sm:py-32 border-t border-white/5">
+    <div class="max-w-6xl mx-auto px-6 lg:px-8">
+      <div class="text-center mb-16 appear">
+        <span class="text-xs font-medium text-emerald-400 tracking-widest uppercase">Whispers</span>
+        <h2 class="font-serif text-4xl sm:text-5xl font-bold tracking-tighter mt-3" style="background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          From the Grove
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="appear wish-card border-gradient rounded-2xl bg-white/5 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <img src="https://picsum.photos/seed/avatar-linden1/64/64.jpg" class="w-10 h-10 rounded-full object-cover border border-white/10"/>
+            <div>
+              <p class="text-sm font-medium">Luna M.</p>
+              <p class="text-xs text-white/30">Wish cast 3 moons ago</p>
+            </div>
+          </div>
+          <p class="text-sm text-white/50 leading-relaxed italic">"I wished for courage, and the linden delivered. Three weeks later, I finally took the leap I'd been avoiding for years. This fragrance is a reminder that wishes don't just happen — they unlock what's already inside you."</p>
+          <div class="flex gap-1 mt-4">
+            <span class="text-emerald-400 text-sm">★★★★★</span>
+          </div>
+        </div>
+
+        <div class="appear wish-card border-gradient rounded-2xl bg-white/5 p-6" style="transition-delay: 0.1s;">
+          <div class="flex items-center gap-3 mb-4">
+            <img src="https://picsum.photos/seed/avatar-linden2/64/64.jpg" class="w-10 h-10 rounded-full object-cover border border-white/10"/>
+            <div>
+              <p class="text-sm font-medium">Ash K.</p>
+              <p class="text-xs text-white/30">Wish cast 7 moons ago</p>
+            </div>
+          </div>
+          <p class="text-sm text-white/50 leading-relaxed italic">"The scent alone is transcendent. Linden bark and midnight moss — it smells like possibility. I keep it on my nightstand and spray it before sleep. My dreams have never been more vivid."</p>
+          <div class="flex gap-1 mt-4">
+            <span class="text-emerald-400 text-sm">★★★★★</span>
+          </div>
+        </div>
+
+        <div class="appear wish-card border-gradient rounded-2xl bg-white/5 p-6" style="transition-delay: 0.2s;">
+          <div class="flex items-center gap-3 mb-4">
+            <img src="https://picsum.photos/seed/avatar-linden3/64/64.jpg" class="w-10 h-10 rounded-full object-cover border border-white/10"/>
+            <div>
+              <p class="text-sm font-medium">River S.</p>
+              <p class="text-xs text-white/30">Wish cast 1 moon ago</p>
+            </div>
+          </div>
+          <p class="text-sm text-white/50 leading-relaxed italic">"I didn't believe in the wish — I bought it for the scent. But I made one anyway, just for the ritual. Last Tuesday, something impossible happened. I'm still shaking. The linden is real."</p>
+          <div class="flex gap-1 mt-4">
+            <span class="text-emerald-400 text-sm">★★★★★</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="py-24 sm:py-32 border-t border-white/5 relative overflow-hidden">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgba(52,211,153,0.08), transparent 60%)"></div>
+
+    <div class="relative z-10 max-w-3xl mx-auto px-6 lg:px-8 text-center appear">
+      <div class="wish-orb mx-auto mb-8" style="width:20px;height:20px;"></div>
+      <h2 class="font-serif text-4xl sm:text-6xl font-bold tracking-tighter mb-6" style="background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.6) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        The Linden Awaits
+      </h2>
+      <p class="text-white/50 text-lg leading-relaxed mb-10 max-w-xl mx-auto">
+        Only 1,000 bottles exist. Each one carries the scent of the sacred grove and the promise of one wish. Will you find the linden — or will it find you?
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="#wish" class="inline-flex items-center gap-2 px-8 py-3.5 bg-emerald-400 hover:bg-emerald-300 text-black text-sm font-medium rounded-full transition-all duration-300 shadow-lg shadow-emerald-900/25">
+          Cast Your Wish
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#collection" class="inline-flex items-center gap-2 px-8 py-3.5 bg-white/5 hover:bg-white/10 text-white text-sm font-medium rounded-full border border-white/10 hover:border-white/20 transition-all duration-300">
+          View Collection
+        </a>
+      </div>
+
+      <div class="mt-12 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-xs text-white/40"><span class="text-emerald-400 font-medium" id="remainingCount">153</span> bottles remaining</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 py-12">
+    <div class="max-w-6xl mx-auto px-6 lg:px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-10">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-emerald-400/20 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M12 2C8 6 4 10 4 14a8 8 0 0016 0c0-4-4-8-8-12z"/></svg>
+            </div>
+            <span class="text-sm font-semibold tracking-wider uppercase">ONWR</span>
+          </div>
+          <p class="text-xs text-white/30 leading-relaxed">From the Enchantment collection. Where nature whispers and dreams take root.</p>
+        </div>
+        <div>
+          <h4 class="text-xs font-medium text-white/50 uppercase tracking-wider mb-4">Explore</h4>
+          <div class="space-y-2">
+            <a href="#story" class="block text-sm text-white/30 hover:text-white transition-colors">The Legend</a>
+            <a href="#ritual" class="block text-sm text-white/30 hover:text-white transition-colors">The Ritual</a>
+            <a href="#wish" class="block text-sm text-white/30 hover:text-white transition-colors">Make a Wish</a>
+            <a href="#collection" class="block text-sm text-white/30 hover:text-white transition-colors">Collection</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="text-xs font-medium text-white/50 uppercase tracking-wider mb-4">Connect</h4>
+          <div class="space-y-2">
+            <a href="#" class="block text-sm text-white/30 hover:text-white transition-colors">Instagram</a>
+            <a href="#" class="block text-sm text-white/30 hover:text-white transition-colors">Twitter / X</a>
+            <a href="#" class="block text-sm text-white/30 hover:text-white transition-colors">TikTok</a>
+            <a href="#" class="block text-sm text-white/30 hover:text-white transition-colors">Newsletter</a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-white/20">© 2025 ONWR Enchantment. All rights reserved.</p>
+        <p class="text-xs text-white/20">Lone Wish Linden — Limited Edition</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-[100] space-y-3"></div>
+
+  <script>
+    // Mobile Menu
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+
+    // Scroll Appear
+    const appearEls = document.querySelectorAll('.appear');
+    const appearObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    appearEls.forEach(el => appearObserver.observe(el));
+
+    // Particles
+    function createParticle() {
+      const container = document.getElementById('particles');
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.bottom = '-10px';
+      particle.style.animationDuration = (6 + Math.random() * 8) + 's';
+      particle.style.width = (2 + Math.random() * 3) + 'px';
+      particle.style.height = particle.style.width;
+      const colors = ['rgba(52,211,153,0.6)', 'rgba(45,212,191,0.5)', 'rgba(34,211,238,0.4)'];
+      particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+      container.appendChild(particle);
+      setTimeout(() => particle.remove(), 14000);
+    }
+    setInterval(createParticle, 600);
+
+    // Falling Leaves
+    function createLeaf() {
+      const container = document.getElementById('leaves');
+      const leaf = document.createElement('div');
+      leaf.classList.add('leaf');
+      leaf.style.left = Math.random() * 100 + '%';
+      leaf.style.animationDuration = (8 + Math.random() * 12) + 's';
+      leaf.style.width = (5 + Math.random() * 6) + 'px';
+      leaf.style.height = (8 + Math.random() * 8) + 'px';
+      container.appendChild(leaf);
+      setTimeout(() => leaf.remove(), 20000);
+    }
+    setInterval(createLeaf, 3000);
+
+    // Wish Functionality
+    const wishInput = document.getElementById('wishInput');
+    const charCount = document.getElementById('charCount');
+    const castWishBtn = document.getElementById('castWishBtn');
+    const wishContainer = document.getElementById('wishContainer');
+    const wishReleased = document.getElementById('wishReleased');
+    const wishOrbContainer = document.getElementById('wishOrbContainer');
+    const newWishBtn = document.getElementById('newWishBtn');
+    const wishCountEl = document.getElementById('wishCount');
+
+    let wishCount = 2847;
+
+    wishInput.addEventListener('input', () => {
+      const len = wishInput.value.length;
+      charCount.textContent = `${len} / 200`;
+      castWishBtn.disabled = len === 0;
+    });
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const bgColor = type === 'success' ? 'bg-emerald-400/10 border-emerald-400/30' : 'bg-white/5 border-white/10';
+      const textColor = type === 'success' ? 'text-emerald-400' : 'text-white/70';
+      toast.className = `toast ${bgColor} border backdrop-blur-lg rounded-xl px-5 py-3 ${textColor} text-sm shadow-2xl`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    castWishBtn.addEventListener('click', () => {
+      const wish = wishInput.value.trim();
+      if (!wish) return;
+
+      wishContainer.style.opacity = '0';
+      wishContainer.style.transform = 'scale(0.95)';
+      wishContainer.style.transition = 'all 0.5s ease';
+
+      setTimeout(() => {
+        wishContainer.classList.add('hidden');
+        wishReleased.classList.remove('hidden');
+        wishReleased.style.opacity = '0';
+        wishReleased.style.transform = 'translateY(20px)';
+        requestAnimationFrame(() => {
+          wishReleased.style.transition = 'all 0.6s ease';
+          wishReleased.style.opacity = '1';
+          wishReleased.style.transform = 'translateY(0)';
+        });
+
+        const orb = document.createElement('div');
+        orb.className = 'wish-rising';
+        orb.innerHTML = `<div class="wish-orb" style="width:20px;height:20px;"></div>`;
+        wishOrbContainer.appendChild(orb);
+
+        for (let i = 0; i < 20; i++) setTimeout(() => createParticle(), i * 100);
+
+        wishCount++;
+        wishCountEl.textContent = wishCount.toLocaleString();
+
+        showToast('✨ Your wish has been released to the linden');
+      }, 500);
+    });
+
+    newWishBtn.addEventListener('click', () => {
+      wishReleased.classList.add('hidden');
+      wishOrbContainer.innerHTML = '';
+      wishContainer.classList.remove('hidden');
+      wishInput.value = '';
+      charCount.textContent = '0 / 200';
+      castWishBtn.disabled = true;
+      requestAnimationFrame(() => {
+        wishContainer.style.opacity = '1';
+        wishContainer.style.transform = 'scale(1)';
+      });
+    });
+
+    wishContainer.addEventListener('click', (e) => {
+      if (e.target === wishInput || e.target === castWishBtn) return;
+      const ripple = document.createElement('div');
+      ripple.className = 'ripple';
+      ripple.style.left = e.clientX - wishContainer.getBoundingClientRect().left + 'px';
+      ripple.style.top = e.clientY - wishContainer.getBoundingClientRect().top + 'px';
+      wishContainer.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 1500);
+    });
+
+    // Add to Cart
+    document.getElementById('addToCartBtn').addEventListener('click', function() {
+      this.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        Added to Collection
+      `;
+      this.classList.remove('bg-emerald-400', 'hover:bg-emerald-300');
+      this.classList.add('bg-white/10');
+      this.disabled = true;
+      const remainingEl = document.getElementById('remainingCount');
+      let remaining = parseInt(remainingEl.textContent);
+      remainingEl.textContent = remaining - 1;
+      showToast('🌿 Lone Wish Linden added to your collection');
+    });
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // Nav scroll
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        nav.classList.add('bg-black/80');
+        nav.classList.remove('bg-black/60');
+      } else {
+        nav.classList.remove('bg-black/80');
+        nav.classList.add('bg-black/60');
+      }
+    });
+
+    // Remaining count slow decrease
+    setInterval(() => {
+      const remainingEl = document.getElementById('remainingCount');
+      let remaining = parseInt(remainingEl.textContent);
+      if (remaining > 1 && Math.random() > 0.7) remainingEl.textContent = remaining - 1;
+    }, 15000);
+  </script>
+</body>
+</html>
